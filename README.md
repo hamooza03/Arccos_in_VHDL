@@ -13,7 +13,7 @@ This VHDL project implements a hardware-based approximation of the `arccos` func
 - **Ripple blanking** to suppress leading zeroes on displays
 - Timing constraints and analysis included for synthesis on FPGA
 
-
+![Arccos Output Example](Images/Output_Example.png)
 
 
 
