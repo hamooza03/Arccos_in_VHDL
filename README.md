@@ -20,7 +20,7 @@ Below is an example of the computed arccosine angle when the input is set to `12
 ![Arccos Output Example](Images/Output_Example.png)
 
 
-The result is displayed on the 3 of the 4 7-segment displays (HEX0 to HEX3) because of Ripple Blanking, showing a decimal value that corresponds to the approximated angle in degrees.
+The result is displayed on the 3 of the 4 7-segment displays (HEX0 to HEX3) because of Ripple Blanking, showing a decimal value that corresponds to the approximated angle in degrees shifted by 10. In reality the number is 60.1 and not 601.
 
 
 ## Authors
