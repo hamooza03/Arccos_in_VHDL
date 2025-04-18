@@ -22,3 +22,8 @@ Below is an example of the computed arccosine angle when the input is set to `12
 
 The result is displayed on the 3 of the 4 7-segment displays (HEX0 to HEX3) because of Ripple Blanking, showing a decimal value that corresponds to the approximated angle in degrees.
 
+
+## Authors
+- [Hamza Abu Alkhair](https://github.com/hamooza03)
+- [Omar Moussa](https://github.com/OmarCE11)
+- [Hamza Al Farrash]
