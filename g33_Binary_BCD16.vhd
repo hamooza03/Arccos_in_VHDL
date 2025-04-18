@@ -1,30 +1,302 @@
 --
 -- entity name: g33_Binary_BCD16
 --
--- Version: 1.0
--- Authors: Hamza Abu Alkhair, Hamza El Farrash
--- Date: February 25th - 5:01pm 
+-- Version 1.3
+-- Authors: Hamza Abu Alkhair, Omar Moussa and Hamza Al Farrash
+-- Date: April 3, 2025
 
 library ieee;
 use ieee.std_logic_1164.all;
 
 entity g33_Binary_BCD16 is
-	port (bin : in std_logic_vector(15 downto 0);
-				BCD5 : out std_logic_vector(3 downto 0);
-				BCD4 : out std_logic_vector(3 downto 0);
-				BCD3 : out std_logic_vector(3 downto 0);
-				BCD2 : out std_logic_vector(3 downto 0);
-				BCD1 : out std_logic_vector(3 downto 0) );
+  port(
+    bin : in  std_logic_vector(15 downto 0);
+    BCD5 : out std_logic_vector(3 downto 0);
+    BCD4 : out std_logic_vector(3 downto 0);
+    BCD3 : out std_logic_vector(3 downto 0);
+    BCD2 : out std_logic_vector(3 downto 0);
+    BCD1 : out std_logic_vector(3 downto 0)
+  );
 end g33_Binary_BCD16;
 
-architecture behave of g33_Binary_BCD16 is
+architecture Structural of g33_Binary_BCD16 is
+
+  ----------------------------------------------------------------------------
+  -- 1) Declare the DM74185 component (see g51_DM74185)
+  ----------------------------------------------------------------------------
+  component g33_DM74185
+    port(
+      EDCBA : in  std_logic_vector(4 downto 0);  -- 5 input bits: E,D,C,B,A
+      Y     : out std_logic_vector(5 downto 0)   -- 6 output bits: Y6..Y1
+    );
+  end component;
+
+  ----------------------------------------------------------------------------
+  -- 2) Internal signals for the 16 outputs Y0..Y15, each 6 bits wide
+  ----------------------------------------------------------------------------
+  signal Y0, Y1, Y2, Y3, Y4, Y5, Y6, Y7,
+         Y8, Y9, Y10, Y11, Y12, Y13, Y14, Y15
+         : std_logic_vector(5 downto 0);
+
+  ----------------------------------------------------------------------------
+  -- 3) Local signals for each DM74185's EDCBA input (5 bits each).
+  --    This avoids "not globally static" errors when using aggregates.
+  ----------------------------------------------------------------------------
+  signal EDCBA_DM0,  EDCBA_DM1,  EDCBA_DM2,  EDCBA_DM3,
+         EDCBA_DM4,  EDCBA_DM5,  EDCBA_DM6,  EDCBA_DM7,
+         EDCBA_DM8,  EDCBA_DM9,  EDCBA_DM10, EDCBA_DM11,
+         EDCBA_DM12, EDCBA_DM13, EDCBA_DM14, EDCBA_DM15
+         : std_logic_vector(4 downto 0);
+
 begin
-	-- create middle wires / connections
-	Isnt1: g33_DM74185 port map(EDCBA(4) => bin(15), 
-										 EDCBA(3) => bin(14), 
-										 EDCBA(2) => bin(13), 
-										 EDCBA(1) => bin(12),
-										 EDCBA(0) => bin(11),
-										 Y);
 
-end g33_Binary_BCD16;
+  ----------------------------------------------------------------------------
+  -- Assign signals for DM0
+  ----------------------------------------------------------------------------
+  EDCBA_DM0(4) <= bin(15);
+  EDCBA_DM0(3) <= bin(14);
+  EDCBA_DM0(2) <= bin(13);
+  EDCBA_DM0(1) <= bin(12);
+  EDCBA_DM0(0) <= bin(11);
+
+  DM0 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM0,
+      Y     => Y0
+    );
+
+  ----------------------------------------------------------------------------
+  -- Assign signals for DM1
+  ----------------------------------------------------------------------------
+  EDCBA_DM1(4) <= Y0(2);
+  EDCBA_DM1(3) <= Y0(1);
+  EDCBA_DM1(2) <= Y0(0);
+  EDCBA_DM1(1) <= bin(10);
+  EDCBA_DM1(0) <= bin(9);
+
+  DM1 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM1,
+      Y     => Y1
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM2
+  ----------------------------------------------------------------------------
+  EDCBA_DM2(4) <= Y0(5);
+  EDCBA_DM2(3) <= Y0(4);
+  EDCBA_DM2(2) <= Y0(3);
+  EDCBA_DM2(1) <= Y1(4);
+  EDCBA_DM2(0) <= Y1(3);
+
+  DM2 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM2,
+      Y     => Y2
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM3
+  ----------------------------------------------------------------------------
+  EDCBA_DM3(4) <= Y1(2);
+  EDCBA_DM3(3) <= Y1(1);
+  EDCBA_DM3(2) <= Y1(0);
+  EDCBA_DM3(1) <= bin(8);
+  EDCBA_DM3(0) <= bin(7);
+
+  DM3 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM3,
+      Y     => Y3
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM4
+  ----------------------------------------------------------------------------
+  EDCBA_DM4(4) <= Y2(2);
+  EDCBA_DM4(3) <= Y2(1);
+  EDCBA_DM4(2) <= Y2(0);
+  EDCBA_DM4(1) <= Y3(4);
+  EDCBA_DM4(0) <= Y3(3);
+
+  DM4 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM4,
+      Y     => Y4
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM5
+  ----------------------------------------------------------------------------
+  EDCBA_DM5(4) <= Y3(2);
+  EDCBA_DM5(3) <= Y3(1);
+  EDCBA_DM5(2) <= Y3(0);
+  EDCBA_DM5(1) <= bin(6);
+  EDCBA_DM5(0) <= bin(5);
+
+  DM5 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM5,
+      Y     => Y5
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM6
+  ----------------------------------------------------------------------------
+  EDCBA_DM6(4) <= Y2(5);
+  EDCBA_DM6(3) <= Y2(4);
+  EDCBA_DM6(2) <= Y2(3);
+  EDCBA_DM6(1) <= Y4(4);
+  EDCBA_DM6(0) <= Y4(3);
+
+  DM6 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM6,
+      Y     => Y6
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM7
+  ----------------------------------------------------------------------------
+  EDCBA_DM7(4) <= Y4(2);
+  EDCBA_DM7(3) <= Y4(1);
+  EDCBA_DM7(2) <= Y4(0);
+  EDCBA_DM7(1) <= Y5(4);
+  EDCBA_DM7(0) <= Y5(3);
+
+  DM7 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM7,
+      Y     => Y7
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM8
+  ----------------------------------------------------------------------------
+  EDCBA_DM8(4) <= '0';
+  EDCBA_DM8(3) <= Y5(1);
+  EDCBA_DM8(2) <= Y5(0);
+  EDCBA_DM8(1) <= bin(4);
+  EDCBA_DM8(0) <= bin(3);
+
+  DM8 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM8,
+      Y     => Y8
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM9
+  ----------------------------------------------------------------------------
+  EDCBA_DM9(4) <= Y6(2);
+  EDCBA_DM9(3) <= Y6(1);
+  EDCBA_DM9(2) <= Y6(0);
+  EDCBA_DM9(1) <= Y7(4);
+  EDCBA_DM9(0) <= Y7(3);
+
+  DM9 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM9,
+      Y     => Y9
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM10
+  ----------------------------------------------------------------------------
+  EDCBA_DM10(4) <= Y7(2);
+  EDCBA_DM10(3) <= Y7(1);
+  EDCBA_DM10(2) <= Y7(0);
+  EDCBA_DM10(1) <= Y8(4);
+  EDCBA_DM10(0) <= Y8(3);
+
+  DM10 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM10,
+      Y     => Y10
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM11
+  ----------------------------------------------------------------------------
+  EDCBA_DM11(4) <= Y8(2);
+  EDCBA_DM11(3) <= Y8(1);
+  EDCBA_DM11(2) <= Y8(0);
+  EDCBA_DM11(1) <= bin(2);
+  EDCBA_DM11(0) <= bin(1);
+
+  DM11 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM11,
+      Y     => Y11
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM12
+  ----------------------------------------------------------------------------
+  EDCBA_DM12(4) <= Y6(5);
+  EDCBA_DM12(3) <= Y6(4);
+  EDCBA_DM12(2) <= Y6(3);
+  EDCBA_DM12(1) <= Y9(4);
+  EDCBA_DM12(0) <= Y9(3);
+
+  DM12 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM12,
+      Y     => Y12
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM13
+  ----------------------------------------------------------------------------
+  EDCBA_DM13(4) <= Y9(2);
+  EDCBA_DM13(3) <= Y9(1);
+  EDCBA_DM13(2) <= Y9(0);
+  EDCBA_DM13(1) <= Y10(4);
+  EDCBA_DM13(0) <= Y10(3);
+
+  DM13 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM13,
+      Y     => Y13
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM14
+  ----------------------------------------------------------------------------
+  EDCBA_DM14(4) <= '0';
+  EDCBA_DM14(3) <= Y10(2);
+  EDCBA_DM14(2) <= Y10(1);
+  EDCBA_DM14(1) <= Y10(0);
+  EDCBA_DM14(0) <= Y11(4);
+
+  DM14 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM14,
+      Y     => Y14
+    );
+
+  ----------------------------------------------------------------------------
+  -- DM15
+  ----------------------------------------------------------------------------
+  EDCBA_DM15(4) <= '0';
+  EDCBA_DM15(3) <= Y12(2);
+  EDCBA_DM15(2) <= Y12(1);
+  EDCBA_DM15(1) <= Y12(0);
+  EDCBA_DM15(0) <= Y13(4);
+
+  DM15 : g33_DM74185
+    port map(
+      EDCBA => EDCBA_DM15,
+      Y     => Y15
+    );
+
+  ----------------------------------------------------------------------------
+  -- 4) Final Output Assignments
+  ----------------------------------------------------------------------------
+  BCD5 <= Y12(5) & Y12(4) & Y12(3) & Y15(3);
+  BCD4 <= Y15(2) & Y15(1) & Y15(0) & Y13(3);
+  BCD3 <= Y13(2) & Y13(1) & Y13(0) & Y14(3);
+  BCD2 <= Y14(2) & Y14(1) & Y14(0) & Y11(3);
+  BCD1 <= Y11(2) & Y11(1) & Y11(0) & bin(0);
+
+end Structural;
